@@ -27,4 +27,4 @@ _deps/
 Thumbs.db
 
 # clangd
-.cache/clangd/**
+.cache/
