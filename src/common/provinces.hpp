@@ -3,13 +3,13 @@
 #include "orders.hpp"
 #include "units.hpp"
 #include <cassert>
-#include <format>
 #include <functional>
 #include <optional>
 #include <string>
 #include <string_view>
 #include <variant>
 #include <vector>
+#include <format>
 
 // ─────────────────────────────────────────────
 // Structures
@@ -95,7 +95,7 @@ class Province {
         if (units_.empty())
             throw std::logic_error(
                 std::format("Impossible de poser un ordre sur {} : province sans unités", name_));
-        order_ = std::move(o);
+        order_.emplace(std::move(o));
     }
 
     void clearOrder() { order_.reset(); }

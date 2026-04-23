@@ -1,7 +1,6 @@
 #pragma once
 
 #include "houses.hpp"
-#include <cstdint>
 #include <string_view>
 #include <variant>
 
@@ -46,10 +45,10 @@ constexpr int combatStrength(const Unit& u) noexcept {
         [](const auto& unit) -> int { return unit.retreating ? 0 : unit.combatStrength; }, u);
 }
 
-const House& unitOwner(const Unit& u) noexcept {
+inline const House& unitOwner(const Unit& u) noexcept {
     return std::visit([](const auto& unit) -> const House& { return unit.owner; }, u);
 }
 
-bool isRetreating(const Unit& u) noexcept {
+inline bool isRetreating(const Unit& u) noexcept {
     return std::visit([](const auto& unit) -> bool { return unit.retreating; }, u);
 }

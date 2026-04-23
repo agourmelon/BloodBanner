@@ -1,22 +1,12 @@
 #pragma once
 
 #include <array>
-#include <format>
 #include <iterator>
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <format>
 
-struct House {
-    std::string_view name;
-    HouseCardHand    cards;
-
-    ~House()                = default;
-    House(House&)           = delete;
-    void operator=(House&)  = delete;
-    House(House&&)          = delete;
-    void operator=(House&&) = delete;
-};
 
 struct HouseCard {
     std::string_view name;
@@ -58,4 +48,17 @@ class HouseCardHand {
             throw std::logic_error("Hand is empty!!");
         }
     };
+};
+
+struct House {
+    std::string_view name;
+    HouseCardHand    cards;
+
+    ~House()                = default;
+    House(House&)           = delete;
+    void operator=(House&)  = delete;
+    House(House&&)          = delete;
+    void operator=(House&&) = delete;
+
+    bool operator==(const House& h) const {return name == h.name;}
 };

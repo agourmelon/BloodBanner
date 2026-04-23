@@ -1,7 +1,6 @@
 #pragma once
 
 #include "houses.hpp"
-#include <cstdint>
 #include <string_view>
 #include <variant>
 
@@ -53,6 +52,6 @@ constexpr bool isRaidable(const Order& o) noexcept {
     return std::holds_alternative<SupportOrder>(o) || std::holds_alternative<MusterOrder>(o);
 }
 
-const House& orderOwner(const Order& o) noexcept {
+inline const House& orderOwner(const Order& o) noexcept {
     return std::visit([](const auto& order) -> const House& { return order.owner; }, o);
 }

@@ -1,0 +1,30 @@
+# Build
+build/
+cmake-build-*/
+
+# IDE
+.vscode/
+.idea/
+*.user
+
+# Compilateur
+*.o
+*.a
+*.so
+*.out
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+compile_commands.json
+
+# Google Test
+_deps/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# clangd
+.cache/clangd/**
