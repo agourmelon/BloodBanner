@@ -7,23 +7,29 @@
 // ─────────────────────────────────────────────
 // Unités
 // ─────────────────────────────────────────────
+struct UnitBase {
+    const House* owner;
+    bool         retreating = false;
 
-struct Footman {
+    bool operator==(const UnitBase& o) const noexcept {
+        return &owner == &o.owner && retreating == o.retreating;
+    }
+};
+
+struct Footman : UnitBase {
     static constexpr std::string_view name            = "Fantassin";
     static constexpr int              recruitmentCost = 1;
     static constexpr int              combatStrength  = 1;
 
-    const House& owner;
-    bool         retreating = false;
+    bool operator==(const Footman&) const = default;
 };
 
-struct Knight {
+struct Knight : UnitBase {
     static constexpr std::string_view name            = "Chevalier";
     static constexpr int              recruitmentCost = 2;
     static constexpr int              combatStrength  = 2;
 
-    const House& owner;
-    bool         retreating = false;
+    bool operator==(const Knight&) const = default;
 };
 
 using Unit = std::variant<Footman, Knight>;
@@ -46,7 +52,7 @@ constexpr int combatStrength(const Unit& u) noexcept {
 }
 
 inline const House& unitOwner(const Unit& u) noexcept {
-    return std::visit([](const auto& unit) -> const House& { return unit.owner; }, u);
+    return *std::visit([](const auto& unit) -> const House* { return unit.owner; }, u);
 }
 
 inline bool isRetreating(const Unit& u) noexcept {

@@ -10,9 +10,9 @@
 
 struct HouseCard {
     std::string_view name;
-    const int        combatStrength = 0;
-    const int        swords         = 0;
-    const int        towers         = 0;
+    int        combatStrength = 0;
+    int        swords         = 0;
+    int        towers         = 0;
 
     bool operator==(const HouseCard&) const = default;
 };
