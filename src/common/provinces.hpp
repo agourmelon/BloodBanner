@@ -5,6 +5,7 @@
 #include <cassert>
 #include <functional>
 #include <optional>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <variant>
@@ -72,7 +73,9 @@ class Province {
     // ── Unités ────────────────────────────────
 
     void addUnit(Unit u) {
-        assert(units_.empty() || unitOwner(u) == unitOwner(units_.front()));
+        if (!units_.empty() && (unitOwner(u) != unitOwner(units_.front())))
+            throw std::logic_error(
+                std::format("Impossible de déplacer unité sur {} : province occupée", name_));
         if (units_.empty())
             controller_ = std::cref(unitOwner(u));
         units_.push_back(std::move(u));
