@@ -12,7 +12,7 @@ struct UnitBase {
     bool         retreating = false;
 
     bool operator==(const UnitBase& o) const noexcept {
-        return &owner == &o.owner && retreating == o.retreating;
+        return owner == o.owner && retreating == o.retreating;
     }
 };
 
@@ -21,7 +21,7 @@ struct Footman : UnitBase {
     static constexpr int              recruitmentCost = 1;
     static constexpr int              combatStrength  = 1;
 
-    bool operator==(const Footman&) const = default;
+    bool operator==(const Footman& o) const = default;
 };
 
 struct Knight : UnitBase {
@@ -29,7 +29,7 @@ struct Knight : UnitBase {
     static constexpr int              recruitmentCost = 2;
     static constexpr int              combatStrength  = 2;
 
-    bool operator==(const Knight&) const = default;
+    bool operator==(const Knight& o) const = default;
 };
 
 using Unit = std::variant<Footman, Knight>;

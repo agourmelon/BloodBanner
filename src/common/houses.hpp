@@ -4,6 +4,7 @@
 #include <iterator>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <vector>
 #include <format>
 
@@ -30,7 +31,7 @@ class HouseCardHand {
     ~HouseCardHand()                = default;
     HouseCardHand(HouseCardHand&)   = delete;
     void operator=(HouseCardHand&)  = delete;
-    HouseCardHand(HouseCardHand&&)  = delete;
+    HouseCardHand(HouseCardHand&&)  = default;
     void operator=(HouseCardHand&&) = delete;
 
     const std::vector<HouseCard>& available() const { return availables_; }
@@ -55,10 +56,12 @@ struct House {
     std::string_view name;
     HouseCardHand    cards;
 
+    House(std::string_view n, HouseCardHand&& c): name{n}, cards{std::move(c)} {}
+
     ~House()                = default;
     House(House&)           = delete;
     void operator=(House&)  = delete;
-    House(House&&)          = delete;
+    House(House&&)          = default;
     void operator=(House&&) = delete;
 
     bool operator==(const House& h) const {return name == h.name;}
