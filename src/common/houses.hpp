@@ -39,11 +39,12 @@ class HouseCardHand {
         auto it = std::ranges::find(availables_, card);
         if (it == availables_.end())
             throw std::out_of_range(std::format("{} is not found in hand", card.name));
-        if (availables_.size() > 1) {
+        availables_.erase(it);
+        if (availables_.size() > 0) {
             used_.push_back(card);
-            availables_.erase(it);
-        } else if (availables_.size() == 1) {
-            std::swap(availables_, used_);
+        } else if (availables_.size() == 0) {
+            availables_ = std::move(used_);
+            used_.push_back(card);
         } else {
             throw std::logic_error("Hand is empty!!");
         }
