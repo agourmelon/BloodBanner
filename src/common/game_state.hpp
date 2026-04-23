@@ -46,7 +46,7 @@ class GameMap {
 
     [[nodiscard]] bool hasProvince(const std::string& id) const { return provinces_.contains(id); }
 
-    [[nodiscard]] const std::vector<std::string>& provinceIds() const noexcept {
+    [[nodiscard]] const std::vector<std::string>& provinceNames() const noexcept {
         return orderedIds_;
     }
 
