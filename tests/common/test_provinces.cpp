@@ -24,15 +24,15 @@ protected:
     House lannister{"Lannister", makeHand()};
 
     Province makeEmptyProvince() {
-        return Province{"p01", "Winterfell"};
+        return Province{"Winterfell"};
     }
 
     Province makeProvinceWithCastle() {
-        return Province{"p02", "Port-Réal", Castle{}};
+        return Province{"Port-Réal", Castle{}};
     }
 
     Province makeProvinceWithStronghold() {
-        return Province{"p03", "Castral Roc", Stronghold{}};
+        return Province{"Castral Roc", Stronghold{}};
     }
 };
 

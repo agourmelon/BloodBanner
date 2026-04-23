@@ -41,7 +41,6 @@ constexpr int recruitmentPoints(const Structure& s) noexcept {
 // ─────────────────────────────────────────────
 
 class Province {
-    std::string                                        id_;
     std::string                                        name_;
     std::optional<Structure>                           structure_;
     std::optional<std::reference_wrapper<const House>> controller_;
@@ -50,14 +49,13 @@ class Province {
     std::vector<std::string>                           adjacentIds_;
 
   public:
-    Province(std::string id, std::string name, std::optional<Structure> structure = std::nullopt,
+    Province(std::string name, std::optional<Structure> structure = std::nullopt,
              std::vector<std::string> adjacentIds = {})
-        : id_{std::move(id)}, name_{std::move(name)}, structure_{std::move(structure)},
+        : name_{std::move(name)}, structure_{std::move(structure)},
           adjacentIds_{std::move(adjacentIds)} {}
 
     // ── Getters ───────────────────────────────
 
-    [[nodiscard]] const std::string&              id() const noexcept { return id_; }
     [[nodiscard]] const std::string&              name() const noexcept { return name_; }
     [[nodiscard]] const std::optional<Structure>& structure() const noexcept { return structure_; }
     [[nodiscard]] const std::vector<Unit>&        units() const noexcept { return units_; }
