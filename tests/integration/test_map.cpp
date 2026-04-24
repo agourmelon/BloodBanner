@@ -1,6 +1,6 @@
 #include "common/game_state.hpp"
-#include <gtest/gtest.h>
 #include "test_utils.hpp"
+#include <gtest/gtest.h>
 
 // ─────────────────────────────────────────────
 // Fixture
@@ -8,23 +8,17 @@
 
 class MapIntegrationTest : public ::testing::Test {
 protected:
-    House stark{"Stark", makeHand()};
+    House stark{"Stark",         makeHand()};
     House lannister{"Lannister", makeHand()};
     House baratheon{"Barathéon", makeHand()};
 
-    // Carte à 5 provinces :
-    //
-    //   Winterfell -- Blancport -- Port-Réal
-    //       |                        |
-    //   Castral Roc ----------- Vivesaigues
-    //
     GameMap makeMap() {
         GameMap map;
-        map.addProvince(Province{"Winterfell",  Stronghold{}, {"Blancport",   "Castral Roc"}});
-        map.addProvince(Province{"Blancport",   Castle{},     {"Winterfell",  "Port-Réal"}});
-        map.addProvince(Province{"Port-Réal",   Stronghold{}, {"Blancport",   "Vivesaigues"}});
-        map.addProvince(Province{"Castral Roc", Castle{},     {"Winterfell",  "Vivesaigues"}});
-        map.addProvince(Province{"Vivesaigues", std::nullopt, {"Port-Réal",   "Castral Roc"}});
+        map.addProvince(Province{"Winterfell",  Stronghold{}, {"Blancport",    "Castral Roc"}});
+        map.addProvince(Province{"Blancport",   Castle{},     {"Winterfell",   "Port-Réal"}});
+        map.addProvince(Province{"Port-Réal",   Stronghold{}, {"Blancport",    "Vivesaigues"}});
+        map.addProvince(Province{"Castral Roc", Castle{},     {"Winterfell",   "Vivesaigues"}});
+        map.addProvince(Province{"Vivesaigues", std::nullopt, {"Port-Réal",    "Castral Roc"}});
         return map;
     }
 };
@@ -124,6 +118,6 @@ TEST_F(MapIntegrationTest, StructuresOnMap) {
 
 TEST_F(MapIntegrationTest, RecruitmentPointsOnMap) {
     auto map = makeMap();
-    EXPECT_EQ(recruitmentPoints(map.province("Winterfell").structure().value()), 2); // Stronghold
-    EXPECT_EQ(recruitmentPoints(map.province("Blancport").structure().value()),  1); // Castle
+    EXPECT_EQ(recruitmentPoints(map.province("Winterfell").structure().value()), 2);
+    EXPECT_EQ(recruitmentPoints(map.province("Blancport").structure().value()),  1);
 }

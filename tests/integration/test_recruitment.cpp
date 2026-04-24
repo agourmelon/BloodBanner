@@ -1,4 +1,3 @@
-#include <stdexcept>
 #include "common/game_state.hpp"
 #include "test_utils.hpp"
 #include <gtest/gtest.h>
@@ -56,11 +55,6 @@ TEST_F(RecruitmentIntegrationTest, MusterOrderOnStronghold) {
     EXPECT_TRUE(map.province("Winterfell").order().has_value());
 }
 
-TEST_F(RecruitmentIntegrationTest, MusterOrderOnProvinceWithoutUnitThrows) {
-    auto map = makeMap();
-    EXPECT_THROW(map.province("Port-Réal").setOrder(MusterOrder{stark}), std::logic_error);
-}
-
 // ─────────────────────────────────────────────
 // Recrutement de nouvelles unités
 // ─────────────────────────────────────────────
@@ -113,15 +107,4 @@ TEST_F(RecruitmentIntegrationTest, ControllerUnchangedAfterRecruitment) {
     p.addUnit(Footman{&stark});
 
     EXPECT_EQ(&p.controller()->get(), &stark);
-}
-
-// ─────────────────────────────────────────────
-// Recrutement ennemi impossible sur même province
-// ─────────────────────────────────────────────
-
-TEST_F(RecruitmentIntegrationTest, CannotRecruitEnemyUnitOnOccupiedProvince) {
-    auto map = makeMap();
-    auto& p = map.province("Winterfell");
-    p.addUnit(Footman{&stark});
-    EXPECT_THROW(p.addUnit(Footman{&lannister}), std::logic_error);
 }

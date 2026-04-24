@@ -1,14 +1,14 @@
 #include "common/provinces.hpp"
-#include <gtest/gtest.h>
-#include <stdexcept>
 #include "test_utils.hpp"
+#include <gtest/gtest.h>
 
 // ─────────────────────────────────────────────
 // Fixture
 // ─────────────────────────────────────────────
+
 class ProvinceTest : public ::testing::Test {
 protected:
-    House stark{"Stark", makeHand()};
+    House stark{"Stark",         makeHand()};
     House lannister{"Lannister", makeHand()};
 
     Province makeEmptyProvince() {
@@ -54,17 +54,25 @@ TEST_F(ProvinceTest, NoControllerByDefault) {
     EXPECT_FALSE(p.controller().has_value());
 }
 
-TEST_F(ProvinceTest, SetControllerOnEmptyProvince) {
+TEST_F(ProvinceTest, SetController) {
     auto p = makeEmptyProvince();
     p.setController(stark);
     ASSERT_TRUE(p.controller().has_value());
     EXPECT_EQ(&p.controller()->get(), &stark);
 }
 
-TEST_F(ProvinceTest, SetControllerOnOccupiedProvinceThrows) {
+TEST_F(ProvinceTest, ClearController) {
     auto p = makeEmptyProvince();
-    p.addUnit(Footman{&stark});
-    EXPECT_THROW(p.setController(lannister), std::logic_error);
+    p.setController(stark);
+    p.clearController();
+    EXPECT_FALSE(p.controller().has_value());
+}
+
+TEST_F(ProvinceTest, SetControllerOverride) {
+    auto p = makeEmptyProvince();
+    p.setController(stark);
+    p.setController(lannister);
+    EXPECT_EQ(&p.controller()->get(), &lannister);
 }
 
 // ─────────────────────────────────────────────
@@ -83,17 +91,11 @@ TEST_F(ProvinceTest, AddUnitSetsController) {
     EXPECT_EQ(&p.controller()->get(), &stark);
 }
 
-TEST_F(ProvinceTest, AddMultipleUnitsOfSameOwner) {
+TEST_F(ProvinceTest, AddMultipleUnits) {
     auto p = makeEmptyProvince();
     p.addUnit(Footman{&stark});
     p.addUnit(Knight{&stark});
     EXPECT_EQ(p.units().size(), 2);
-}
-
-TEST_F(ProvinceTest, AddUnitOfDifferentOwnerAsserts) {
-    auto p = makeEmptyProvince();
-    p.addUnit(Footman{&stark});
-    EXPECT_THROW(p.addUnit(Footman{&lannister}), std::logic_error);
 }
 
 TEST_F(ProvinceTest, RemoveUnit) {
@@ -113,16 +115,24 @@ TEST_F(ProvinceTest, NoOrderByDefault) {
     EXPECT_FALSE(p.order().has_value());
 }
 
-TEST_F(ProvinceTest, SetOrderOnOccupiedProvince) {
+TEST_F(ProvinceTest, SetOrder) {
     auto p = makeEmptyProvince();
     p.addUnit(Footman{&stark});
     p.setOrder(MarchOrder{stark});
     EXPECT_TRUE(p.order().has_value());
 }
 
-TEST_F(ProvinceTest, SetOrderOnEmptyProvinceThrows) {
+TEST_F(ProvinceTest, SetOrderOnEmptyProvince) {
     auto p = makeEmptyProvince();
-    EXPECT_THROW(p.setOrder(MarchOrder{stark}), std::logic_error);
+    p.setOrder(MarchOrder{stark});
+    EXPECT_TRUE(p.order().has_value());
+}
+
+TEST_F(ProvinceTest, SetOrderOfDifferentOwner) {
+    auto p = makeEmptyProvince();
+    p.addUnit(Footman{&stark});
+    p.setOrder(MarchOrder{lannister});
+    EXPECT_TRUE(p.order().has_value());
 }
 
 TEST_F(ProvinceTest, ClearOrder) {

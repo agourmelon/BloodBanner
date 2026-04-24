@@ -56,13 +56,13 @@ class GameMap {
 
     [[nodiscard]] std::vector<const Province*> neighbors(const std::string& id) const {
         std::vector<const Province*> result;
-        for (const auto& adjId : province(id).adjacentIds())
+        for (const auto& adjId : province(id).adjacentNames())
             result.push_back(&province(adjId));
         return result;
     }
 
     [[nodiscard]] bool areAdjacent(const std::string& a, const std::string& b) const {
-        const auto& adj = province(a).adjacentIds();
+        const auto& adj = province(a).adjacentNames();
         return std::ranges::find(adj, b) != adj.end();
     }
 

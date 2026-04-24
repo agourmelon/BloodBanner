@@ -2,27 +2,24 @@
 
 #include "orders.hpp"
 #include "units.hpp"
-#include <cassert>
 #include <functional>
 #include <optional>
-#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <variant>
 #include <vector>
-#include <format>
 
 // ─────────────────────────────────────────────
 // Structures
 // ─────────────────────────────────────────────
 
 struct Castle {
-    static constexpr std::string_view name              = "Château";
+    static constexpr std::string_view name             = "Château";
     static constexpr int              recruitmentPoints = 1;
 };
 
 struct Stronghold {
-    static constexpr std::string_view name              = "Forteresse";
+    static constexpr std::string_view name             = "Forteresse";
     static constexpr int              recruitmentPoints = 2;
 };
 
@@ -46,23 +43,24 @@ class Province {
     std::optional<std::reference_wrapper<const House>> controller_;
     std::vector<Unit>                                  units_;
     std::optional<Order>                               order_;
-    std::vector<std::string>                           adjacentIds_;
+    std::vector<std::string>                           adjacentNames_;
 
-  public:
-    Province(std::string name, std::optional<Structure> structure = std::nullopt,
-             std::vector<std::string> adjacentIds = {})
-        : name_{std::move(name)}, structure_{std::move(structure)},
-          adjacentIds_{std::move(adjacentIds)} {}
+public:
+    Province(std::string              name,
+             std::optional<Structure> structure    = std::nullopt,
+             std::vector<std::string> adjacentNames = {})
+        : name_         {std::move(name)}
+        , structure_    {std::move(structure)}
+        , adjacentNames_{std::move(adjacentNames)}
+    {}
 
     // ── Getters ───────────────────────────────
 
-    [[nodiscard]] const std::string&              name() const noexcept { return name_; }
-    [[nodiscard]] const std::optional<Structure>& structure() const noexcept { return structure_; }
-    [[nodiscard]] const std::vector<Unit>&        units() const noexcept { return units_; }
-    [[nodiscard]] const std::optional<Order>&     order() const noexcept { return order_; }
-    [[nodiscard]] const std::vector<std::string>& adjacentIds() const noexcept {
-        return adjacentIds_;
-    }
+    [[nodiscard]] const std::string&              name()         const noexcept { return name_;         }
+    [[nodiscard]] const std::optional<Structure>& structure()    const noexcept { return structure_;    }
+    [[nodiscard]] const std::vector<Unit>&        units()        const noexcept { return units_;        }
+    [[nodiscard]] const std::optional<Order>&     order()        const noexcept { return order_;        }
+    [[nodiscard]] const std::vector<std::string>& adjacentNames()const noexcept { return adjacentNames_;}
 
     [[nodiscard]] std::optional<std::reference_wrapper<const House>> controller() const noexcept {
         return controller_;
@@ -71,33 +69,27 @@ class Province {
     // ── Unités ────────────────────────────────
 
     void addUnit(Unit u) {
-        if (!units_.empty() && (unitOwner(u) != unitOwner(units_.front())))
-            throw std::logic_error(
-                std::format("Impossible de déplacer unité sur {} : province occupée", name_));
         if (units_.empty())
             controller_ = std::cref(unitOwner(u));
         units_.push_back(std::move(u));
     }
 
-    void removeUnit(const Unit& u) { std::erase(units_, u); }
+    void removeUnit(const Unit& u) {
+        std::erase(units_, u);
+    }
 
     // ── Contrôleur ────────────────────────────
 
     void setController(const House& h) {
-        if (!units_.empty())
-            throw std::logic_error(
-                std::format("Impossible de définir le contrôleur de {} : province occupée", name_));
         controller_ = std::cref(h);
+    }
+
+    void clearController() {
+        controller_.reset();
     }
 
     // ── Ordre ─────────────────────────────────
 
-    void setOrder(Order o) {
-        if (units_.empty())
-            throw std::logic_error(
-                std::format("Impossible de poser un ordre sur {} : province sans unités", name_));
-        order_.emplace(std::move(o));
-    }
-
-    void clearOrder() { order_.reset(); }
+    void setOrder(Order o)  { order_.emplace(std::move(o)); }
+    void clearOrder()       { order_.reset();         }
 };
