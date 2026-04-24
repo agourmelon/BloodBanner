@@ -24,7 +24,7 @@ class GameMap {
     std::vector<std::string>                  orderedIds_;
 
   public:
-    void addProvince(Province p) {
+    void addProvince(Province&& p) {
         const std::string id = p.name();
         orderedIds_.push_back(id);
         provinces_.emplace(id, std::move(p));
