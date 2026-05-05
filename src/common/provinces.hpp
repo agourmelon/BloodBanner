@@ -66,6 +66,12 @@ public:
         return controller_;
     }
 
+    // ── Voisins ───────────────────────────────
+
+    void addAdjacentName(std::string name) {
+        adjacentNames_.push_back(std::move(name));
+    }
+
     // ── Unités ────────────────────────────────
 
     void addUnit(Unit u) {
