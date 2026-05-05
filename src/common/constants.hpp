@@ -29,12 +29,8 @@ inline constexpr int HOUSE_CARDS_PER_PLAYER = 7;
 // ─────────────────────────────────────────────
 
 // Unités placées sur la forteresse de départ
-inline constexpr int STARTING_FOOTMEN_ON_STRONGHOLD = 2;
+inline constexpr int STARTING_FOOTMEN_ON_STRONGHOLD = 1;
 inline constexpr int STARTING_KNIGHTS_ON_STRONGHOLD = 1;
-
-// Unités placées sur chaque province adjacente de départ
-inline constexpr int STARTING_FOOTMEN_ON_ADJACENT   = 1;
-inline constexpr int STARTING_ADJACENT_PROVINCES    = 2;
 
 // ─────────────────────────────────────────────
 // Génération de carte

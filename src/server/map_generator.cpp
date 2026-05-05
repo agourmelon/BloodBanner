@@ -141,10 +141,23 @@ GameMap MapGenerator::generate(
     // 2. Calcule les adjacences via la stratégie choisie
     const auto adjacencies = topology_.buildAdjacencies(numProvinces, rng);
 
-    // 3. Assigne les adjacences aux provinces
-    for (std::size_t i = 0; i < numProvinces; ++i)
-        for (const auto ni : adjacencies[i])
+    // 3. Assigne les adjacences aux provinces (sans relier deux forteresses de départ)
+    std::vector<std::string> startingStrongholds;
+    startingStrongholds.reserve(activePlayers.size());
+    for (const auto& house : activePlayers)
+        startingStrongholds.push_back(strongholdOf(*house));
+
+    auto isStartingStronghold = [&](const std::string& name) {
+        return std::ranges::find(startingStrongholds, name) != startingStrongholds.end();
+    };
+
+    for (std::size_t i = 0; i < numProvinces; ++i) {
+        for (const auto ni : adjacencies[i]) {
+            if (isStartingStronghold(provinces[i].name()) && isStartingStronghold(provinces[ni].name()))
+                continue;
             provinces[i].addAdjacentName(provinces[ni].name());
+        }
+    }
 
     // 4. Construit la GameMap
     GameMap map;
@@ -217,26 +230,13 @@ void MapGenerator::placeStartingUnits(
     const std::vector<House*>& activePlayers,
     std::mt19937&              rng
 ) const {
-    for (const auto& house : activePlayers) {
-        const auto strongholdName = strongholdOf(*house);
-        auto& stronghold          = map.province(strongholdName);
+    std::ignore = rng;
 
-        // Unités sur la forteresse de départ
+    for (const auto& house : activePlayers) {
+        auto& stronghold = map.province(strongholdOf(*house));
         for (int f = 0; f < STARTING_FOOTMEN_ON_STRONGHOLD; ++f)
             stronghold.addUnit(Footman{house});
         for (int k = 0; k < STARTING_KNIGHTS_ON_STRONGHOLD; ++k)
             stronghold.addUnit(Knight{house});
-
-        // Unités sur les provinces adjacentes
-        auto neighbors = map.neighbors(strongholdName);
-        std::ranges::shuffle(neighbors, rng);
-
-        const std::size_t adjCount = std::min(
-            static_cast<std::size_t>(STARTING_ADJACENT_PROVINCES),
-            neighbors.size()
-        );
-
-        for (std::size_t j = 0; j < adjCount; ++j)
-            map.province(neighbors[j]->name()).addUnit(Footman{house});
     }
 }
