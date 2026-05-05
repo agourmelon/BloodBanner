@@ -38,6 +38,10 @@ add_executable(test_game_state common/test_game_state.cpp)
 target_link_libraries(test_game_state PRIVATE common test_utils GTest::gtest_main)
 gtest_add_tests(TARGET test_game_state)
 
+add_executable(test_map_generator server/test_map_generator.cpp)
+target_link_libraries(test_map_generator PRIVATE map_generator_lib test_utils GTest::gtest_main)
+gtest_add_tests(TARGET test_map_generator)
+
 # ── Tests d'intégration ───────────────────────────────────────────────────────
 
 add_executable(test_map         integration/test_map.cpp)
