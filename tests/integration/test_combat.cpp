@@ -7,15 +7,15 @@
 // ─────────────────────────────────────────────
 
 class CombatIntegrationTest : public ::testing::Test {
-protected:
-    House stark{"Stark",       makeHand()};
+  protected:
+    House stark{"Stark", makeHand()};
     House lannister{"Lannister", makeHand()};
 
     GameMap makeMap() {
         GameMap map;
-        map.addProvince(Province{"Winterfell",  Stronghold{}, {"Blancport"}});
-        map.addProvince(Province{"Blancport",   Castle{},     {"Winterfell", "Port-Réal"}});
-        map.addProvince(Province{"Port-Réal",   std::nullopt, {"Blancport"}});
+        map.addProvince(Province{"Winterfell", Stronghold{}, {"Blancport"}});
+        map.addProvince(Province{"Blancport", Castle{}, {"Winterfell", "Port-Réal"}});
+        map.addProvince(Province{"Port-Réal", std::nullopt, {"Blancport"}});
         return map;
     }
 };
@@ -37,8 +37,8 @@ TEST_F(CombatIntegrationTest, RetreatingUnitContributesNoStrength) {
 }
 
 TEST_F(CombatIntegrationTest, MixedArmyStrength) {
-    auto map = makeMap();
-    auto& p = map.province("Winterfell");
+    auto  map = makeMap();
+    auto& p   = map.province("Winterfell");
     p.addUnit(Footman{&stark});
     p.addUnit(Footman{&stark});
     p.addUnit(Knight{&stark});
@@ -55,8 +55,8 @@ TEST_F(CombatIntegrationTest, MixedArmyStrength) {
 // ─────────────────────────────────────────────
 
 TEST_F(CombatIntegrationTest, DefenseOrderAddsOneToStrength) {
-    auto map = makeMap();
-    auto& p = map.province("Winterfell");
+    auto  map = makeMap();
+    auto& p   = map.province("Winterfell");
     p.addUnit(Footman{&stark});
     p.setOrder(DefenseOrder{stark});
 
@@ -76,8 +76,8 @@ TEST_F(CombatIntegrationTest, DefenseOrderAddsOneToStrength) {
 // ─────────────────────────────────────────────
 
 TEST_F(CombatIntegrationTest, RetreatingUnitsHaveZeroStrength) {
-    auto map = makeMap();
-    auto& p = map.province("Winterfell");
+    auto  map = makeMap();
+    auto& p   = map.province("Winterfell");
     p.addUnit(Footman{&stark, true});
     p.addUnit(Knight{&stark, true});
 
@@ -89,8 +89,8 @@ TEST_F(CombatIntegrationTest, RetreatingUnitsHaveZeroStrength) {
 }
 
 TEST_F(CombatIntegrationTest, MixedRetreatingAndActiveUnits) {
-    auto map = makeMap();
-    auto& p = map.province("Winterfell");
+    auto  map = makeMap();
+    auto& p   = map.province("Winterfell");
     p.addUnit(Footman{&stark, false});
     p.addUnit(Footman{&stark, true});
     p.addUnit(Knight{&stark, false});
@@ -107,17 +107,17 @@ TEST_F(CombatIntegrationTest, MixedRetreatingAndActiveUnits) {
 // ─────────────────────────────────────────────
 
 TEST_F(CombatIntegrationTest, HouseCardAddsStrength) {
-    auto& hand = stark.cards;
+    auto&       hand      = stark.cards;
     const auto& available = hand.available();
     ASSERT_FALSE(available.empty());
 
-    int baseStrength = 1; // un fantassin
+    int baseStrength  = 1; // un fantassin
     int totalStrength = baseStrength + available.front().combatStrength;
     EXPECT_GE(totalStrength, baseStrength);
 }
 
 TEST_F(CombatIntegrationTest, DiscardedCardIsNoLongerAvailable) {
-    auto& hand = stark.cards;
+    auto&           hand = stark.cards;
     const HouseCard card = hand.available().front();
     hand.discard(card);
     const auto& available = hand.available();

@@ -2,7 +2,6 @@
 #include "common/constants.hpp"
 
 #include <algorithm>
-#include <cmath>
 #include <cstddef>
 #include <format>
 #include <numeric>
@@ -15,20 +14,24 @@
 namespace {
 
 struct CubeCoord {
-    int q, r, s;
+    int  q, r, s;
     bool operator==(const CubeCoord&) const = default;
 };
 
 inline constexpr std::array<CubeCoord, 6> CUBE_DIRECTIONS = {{
-    { 1, -1,  0}, { 1,  0, -1}, { 0,  1, -1},
-    {-1,  1,  0}, {-1,  0,  1}, { 0, -1,  1},
+    {1, -1, 0},
+    {1, 0, -1},
+    {0, 1, -1},
+    {-1, 1, 0},
+    {-1, 0, 1},
+    {0, -1, 1},
 }};
 
 std::vector<CubeCoord> hexagonalGrid(int radius) {
     std::vector<CubeCoord> coords;
     for (int q = -radius; q <= radius; ++q) {
         const int r1 = std::max(-radius, -q - radius);
-        const int r2 = std::min( radius, -q + radius);
+        const int r2 = std::min(radius, -q + radius);
         for (int r = r1; r <= r2; ++r)
             coords.push_back({q, r, -q - r});
     }
@@ -37,19 +40,17 @@ std::vector<CubeCoord> hexagonalGrid(int radius) {
 
 int radiusForProvinces(std::size_t numProvinces) {
     int radius = 0;
-    while (static_cast<std::size_t>(3*radius*radius + 3*radius + 1) < numProvinces)
+    while (static_cast<std::size_t>(3 * radius * radius + 3 * radius + 1) < numProvinces)
         ++radius;
     return radius;
 }
 
 std::string strongholdOf(const House& house) {
-    const auto it = std::ranges::find_if(HOUSE_STRONGHOLDS,
-        [&](const auto& entry) { return entry.first == house.name; }
-    );
+    const auto it = std::ranges::find_if(
+        HOUSE_STRONGHOLDS, [&](const auto& entry) { return entry.first == house.name; });
     if (it == HOUSE_STRONGHOLDS.end())
         throw std::runtime_error(
-            std::format("Forteresse introuvable pour la maison {}", house.name)
-        );
+            std::format("Forteresse introuvable pour la maison {}", house.name));
     return std::string{it->second};
 }
 
@@ -59,18 +60,17 @@ std::string strongholdOf(const House& house) {
 // HexGridStrategy
 // ─────────────────────────────────────────────
 
-std::vector<std::vector<std::size_t>> HexGridStrategy::buildAdjacencies(
-    std::size_t   numProvinces,
-    std::mt19937& rng
-) const {
+std::vector<std::vector<std::size_t>> HexGridStrategy::buildAdjacencies(std::size_t   numProvinces,
+                                                                        std::mt19937& rng) const {
     std::ignore = rng;
 
-    const int radius  = radiusForProvinces(numProvinces);
+    const int  radius = radiusForProvinces(numProvinces);
     const auto coords = hexagonalGrid(radius);
 
     auto indexOf = [&](const CubeCoord& c) -> std::optional<std::size_t> {
         for (std::size_t i = 0; i < std::min(coords.size(), numProvinces); ++i)
-            if (coords[i] == c) return i;
+            if (coords[i] == c)
+                return i;
         return std::nullopt;
     };
 
@@ -78,11 +78,7 @@ std::vector<std::vector<std::size_t>> HexGridStrategy::buildAdjacencies(
 
     for (std::size_t i = 0; i < numProvinces; ++i) {
         for (const auto& dir : CUBE_DIRECTIONS) {
-            const CubeCoord neighbor{
-                coords[i].q + dir.q,
-                coords[i].r + dir.r,
-                coords[i].s + dir.s
-            };
+            const CubeCoord neighbor{coords[i].q + dir.q, coords[i].r + dir.r, coords[i].s + dir.s};
             if (const auto ni = indexOf(neighbor))
                 adjacencies[i].push_back(*ni);
         }
@@ -103,9 +99,7 @@ std::string DefaultNamer::next() {
 // ThematicNamer
 // ─────────────────────────────────────────────
 
-ThematicNamer::ThematicNamer(std::vector<std::string> names)
-    : names_{std::move(names)}
-{}
+ThematicNamer::ThematicNamer(std::vector<std::string> names) : names_{std::move(names)} {}
 
 std::string ThematicNamer::next() {
     if (counter_ < static_cast<size_t>(names_.size()))
@@ -118,19 +112,13 @@ std::string ThematicNamer::next() {
 // ─────────────────────────────────────────────
 
 MapGenerator::MapGenerator(const IMapTopologyStrategy& topology, IProvinceNamer& namer)
-    : topology_{topology}
-    , namer_   {namer}
-{}
+    : topology_{topology}, namer_{namer} {}
 
-GameMap MapGenerator::generate(
-    const std::vector<House*>& activePlayers,
-    std::mt19937&              rng
-) const {
+GameMap MapGenerator::generate(const std::vector<House*>& activePlayers, std::mt19937& rng) const {
     if (activePlayers.size() < static_cast<std::size_t>(MIN_PLAYERS) ||
         activePlayers.size() > static_cast<std::size_t>(MAX_PLAYERS))
         throw std::invalid_argument(
-            std::format("Nombre de joueurs invalide : {}", activePlayers.size())
-        );
+            std::format("Nombre de joueurs invalide : {}", activePlayers.size()));
 
     const std::size_t numProvinces =
         MAP_BASE_PROVINCES + MAP_PROVINCES_PER_PLAYER * activePlayers.size();
@@ -153,7 +141,8 @@ GameMap MapGenerator::generate(
 
     for (std::size_t i = 0; i < numProvinces; ++i) {
         for (const auto ni : adjacencies[i]) {
-            if (isStartingStronghold(provinces[i].name()) && isStartingStronghold(provinces[ni].name()))
+            if (isStartingStronghold(provinces[i].name()) &&
+                isStartingStronghold(provinces[ni].name()))
                 continue;
             provinces[i].addAdjacentName(provinces[ni].name());
         }
@@ -173,10 +162,8 @@ GameMap MapGenerator::generate(
     return map;
 }
 
-std::vector<Province> MapGenerator::buildProvinces(
-    std::size_t   numProvinces,
-    std::mt19937& rng
-) const {
+std::vector<Province> MapGenerator::buildProvinces(std::size_t   numProvinces,
+                                                   std::mt19937& rng) const {
     std::vector<Province> provinces;
     provinces.reserve(numProvinces);
 
@@ -196,11 +183,8 @@ std::vector<Province> MapGenerator::buildProvinces(
 
         const auto it = std::ranges::find(indices, i);
         if (it != indices.end()) {
-            const auto structIdx =
-                static_cast<std::size_t>(std::distance(indices.begin(), it));
-            structure = (structIdx < numCastles)
-                ? Structure{Castle{}}
-                : Structure{Stronghold{}};
+            const auto structIdx = static_cast<std::size_t>(std::distance(indices.begin(), it));
+            structure = (structIdx < numCastles) ? Structure{Castle{}} : Structure{Stronghold{}};
         }
 
         provinces.emplace_back(namer_.next(), std::move(structure));
@@ -209,27 +193,20 @@ std::vector<Province> MapGenerator::buildProvinces(
     return provinces;
 }
 
-void MapGenerator::placeStartingStrongholds(
-    GameMap&                   map,
-    const std::vector<House*>& activePlayers
-) const {
+void MapGenerator::placeStartingStrongholds(GameMap&                   map,
+                                            const std::vector<House*>& activePlayers) const {
     for (const auto& house : activePlayers) {
         const auto name = strongholdOf(*house);
 
         if (!map.hasProvince(name))
-            throw std::runtime_error(
-                std::format("Province introuvable : {}", name)
-            );
+            throw std::runtime_error(std::format("Province introuvable : {}", name));
 
         map.province(name).setController(*house);
     }
 }
 
-void MapGenerator::placeStartingUnits(
-    GameMap&                   map,
-    const std::vector<House*>& activePlayers,
-    std::mt19937&              rng
-) const {
+void MapGenerator::placeStartingUnits(GameMap& map, const std::vector<House*>& activePlayers,
+                                      std::mt19937& rng) const {
     std::ignore = rng;
 
     for (const auto& house : activePlayers) {

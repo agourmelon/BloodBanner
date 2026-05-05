@@ -1,19 +1,18 @@
 #pragma once
 
 #include <array>
+#include <format>
 #include <iterator>
 #include <stdexcept>
 #include <string>
 #include <string_view>
 #include <vector>
-#include <format>
-
 
 struct HouseCard {
     std::string_view name;
-    int        combatStrength = 0;
-    int        swords         = 0;
-    int        towers         = 0;
+    int              combatStrength = 0;
+    int              swords         = 0;
+    int              towers         = 0;
 
     bool operator==(const HouseCard&) const = default;
 };
@@ -56,7 +55,7 @@ struct House {
     std::string_view name;
     HouseCardHand    cards;
 
-    House(std::string_view n, HouseCardHand&& c): name{n}, cards{std::move(c)} {}
+    House(std::string_view n, HouseCardHand&& c) : name{n}, cards{std::move(c)} {}
 
     ~House()                = default;
     House(House&)           = delete;
@@ -64,5 +63,5 @@ struct House {
     House(House&&)          = default;
     void operator=(House&&) = delete;
 
-    bool operator==(const House& h) const {return name == h.name;}
+    bool operator==(const House& h) const { return name == h.name; }
 };

@@ -1,27 +1,26 @@
-#include "server/map_generator.hpp"
 #include "common/constants.hpp"
+#include "server/map_generator.hpp"
 #include "test_utils.hpp"
 
 #include <algorithm>
 #include <format>
-#include <set>
 #include <gtest/gtest.h>
 #include <random>
+#include <set>
 
 // ─────────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────────
 
 static std::string strongholdOf(const House& h) {
-    const auto it = std::ranges::find_if(HOUSE_STRONGHOLDS,
-        [&](const auto& e) { return e.first == h.name; });
+    const auto it =
+        std::ranges::find_if(HOUSE_STRONGHOLDS, [&](const auto& e) { return e.first == h.name; });
     return std::string{it->second};
 }
 
 // Construit un vecteur de noms dont les N premiers sont les forteresses des joueurs actifs.
-static std::vector<std::string> namesWithStrongholds(
-    const std::vector<House*>& players, std::size_t numProvinces
-) {
+static std::vector<std::string> namesWithStrongholds(const std::vector<House*>& players,
+                                                     std::size_t                numProvinces) {
     std::vector<std::string> names;
     for (const auto* h : players)
         names.push_back(strongholdOf(*h));
@@ -43,7 +42,7 @@ TEST(DefaultNamer, Sequential) {
 }
 
 TEST(DefaultNamer, UniqueNames) {
-    DefaultNamer namer;
+    DefaultNamer             namer;
     std::vector<std::string> names;
     for (int i = 0; i < 20; ++i)
         names.push_back(namer.next());
@@ -81,7 +80,7 @@ TEST(ThematicNamer, FallbackContinuesSequentially) {
 // ─────────────────────────────────────────────
 
 class HexGridStrategyTest : public ::testing::Test {
-protected:
+  protected:
     HexGridStrategy strategy;
     std::mt19937    rng{42};
 };
@@ -112,7 +111,8 @@ TEST_F(HexGridStrategyTest, SevenProvinces_CenterHasSixNeighbors) {
 TEST_F(HexGridStrategyTest, SevenProvinces_PeripheralHasThreeNeighbors) {
     const auto adj = strategy.buildAdjacencies(7, rng);
     for (std::size_t i = 0; i < 7; ++i) {
-        if (i == 3) continue; // centre
+        if (i == 3)
+            continue; // centre
         EXPECT_EQ(adj[i].size(), 3u) << "Province périphérique " << i << " devrait avoir 3 voisins";
     }
 }
@@ -149,21 +149,21 @@ TEST_F(HexGridStrategyTest, CorrectTotalSize) {
 // ─────────────────────────────────────────────
 
 class MapGeneratorTest : public ::testing::Test {
-protected:
+  protected:
     House baratheon{"Barathéon", makeHand()};
-    House stark    {"Stark",     makeHand()};
+    House stark{"Stark", makeHand()};
     House lannister{"Lannister", makeHand()};
-    House greyjoy  {"Greyjoy",   makeHand()};
-    House martell  {"Martell",   makeHand()};
-    House tyrell   {"Tyrell",    makeHand()};
+    House greyjoy{"Greyjoy", makeHand()};
+    House martell{"Martell", makeHand()};
+    House tyrell{"Tyrell", makeHand()};
 
     HexGridStrategy topology;
     std::mt19937    rng{42};
 
     GameMap generateFor(std::vector<House*> players) {
         const std::size_t n = MAP_BASE_PROVINCES + MAP_PROVINCES_PER_PLAYER * players.size();
-        ThematicNamer namer(namesWithStrongholds(players, n));
-        MapGenerator  gen(topology, namer);
+        ThematicNamer     namer(namesWithStrongholds(players, n));
+        MapGenerator      gen(topology, namer);
         return gen.generate(players, rng);
     }
 };
@@ -172,19 +172,18 @@ protected:
 
 TEST_F(MapGeneratorTest, TooFewPlayers_Throws) {
     std::vector<House*> players = {&baratheon};
-    const std::size_t n = MAP_BASE_PROVINCES + MAP_PROVINCES_PER_PLAYER;
-    ThematicNamer namer(namesWithStrongholds(players, n));
-    MapGenerator  gen(topology, namer);
+    const std::size_t   n       = MAP_BASE_PROVINCES + MAP_PROVINCES_PER_PLAYER;
+    ThematicNamer       namer(namesWithStrongholds(players, n));
+    MapGenerator        gen(topology, namer);
     EXPECT_THROW(gen.generate(players, rng), std::invalid_argument);
 }
 
 TEST_F(MapGeneratorTest, TooManyPlayers_Throws) {
-    House extra{"Extra", makeHand()};
-    std::vector<House*> players = {
-        &baratheon, &stark, &lannister, &greyjoy, &martell, &tyrell, &extra
-    };
-    DefaultNamer namer;
-    MapGenerator gen(topology, namer);
+    House               extra{"Extra", makeHand()};
+    std::vector<House*> players = {&baratheon, &stark,  &lannister, &greyjoy,
+                                   &martell,   &tyrell, &extra};
+    DefaultNamer        namer;
+    MapGenerator        gen(topology, namer);
     EXPECT_THROW(gen.generate(players, rng), std::invalid_argument);
 }
 
@@ -210,22 +209,26 @@ TEST_F(MapGeneratorTest, StartingStronghold_HasCorrectController) {
 
     ASSERT_TRUE(accalmie.controller().has_value());
     ASSERT_TRUE(winterfell.controller().has_value());
-    EXPECT_EQ(&accalmie.controller()->get(),   &baratheon);
+    EXPECT_EQ(&accalmie.controller()->get(), &baratheon);
     EXPECT_EQ(&winterfell.controller()->get(), &stark);
 }
 
 // ── Unités de départ sur la forteresse ───────
 
 TEST_F(MapGeneratorTest, StartingStronghold_HasCorrectUnitComposition) {
-    auto map = generateFor({&baratheon, &stark});
+    auto        map   = generateFor({&baratheon, &stark});
     const auto& units = map.province("Accalmie").units();
 
     int footmen = 0, knights = 0;
     for (const auto& u : units) {
-        std::visit([&](const auto& unit) {
-            if constexpr (std::is_same_v<std::decay_t<decltype(unit)>, Footman>) ++footmen;
-            else if constexpr (std::is_same_v<std::decay_t<decltype(unit)>, Knight>) ++knights;
-        }, u);
+        std::visit(
+            [&](const auto& unit) {
+                if constexpr (std::is_same_v<std::decay_t<decltype(unit)>, Footman>)
+                    ++footmen;
+                else if constexpr (std::is_same_v<std::decay_t<decltype(unit)>, Knight>)
+                    ++knights;
+            },
+            u);
     }
 
     EXPECT_EQ(footmen, STARTING_FOOTMEN_ON_STRONGHOLD);
@@ -243,8 +246,8 @@ TEST_F(MapGeneratorTest, StartingStronghold_UnitsOwnedByCorrectHouse) {
 
 TEST_F(MapGeneratorTest, StartingStrongholds_AreNotAdjacent) {
     auto map = generateFor({&baratheon, &stark, &lannister});
-    EXPECT_FALSE(map.areAdjacent("Accalmie",   "Winterfell"));
-    EXPECT_FALSE(map.areAdjacent("Accalmie",   "Castral Roc"));
+    EXPECT_FALSE(map.areAdjacent("Accalmie", "Winterfell"));
+    EXPECT_FALSE(map.areAdjacent("Accalmie", "Castral Roc"));
     EXPECT_FALSE(map.areAdjacent("Winterfell", "Castral Roc"));
 }
 
@@ -263,24 +266,23 @@ TEST_F(MapGeneratorTest, AllAdjacenciesAreSymmetric) {
 TEST_F(MapGeneratorTest, AllProvincesHaveAtLeastOneNeighbor) {
     auto map = generateFor({&baratheon, &stark});
     for (const auto& name : map.provinceNames()) {
-        EXPECT_FALSE(map.neighbors(name).empty())
-            << "Province " << name << " n'a aucun voisin";
+        EXPECT_FALSE(map.neighbors(name).empty()) << "Province " << name << " n'a aucun voisin";
     }
 }
 
 // ── Structures ───────────────────────────────
 
 TEST_F(MapGeneratorTest, StructureCount_MatchesRatio) {
-    auto map = generateFor({&baratheon, &stark});
+    auto              map   = generateFor({&baratheon, &stark});
     const std::size_t total = map.size();
 
     std::size_t withStructure = 0;
     for (const auto& name : map.provinceNames()) {
-        if (map.province(name).structure().has_value()) ++withStructure;
+        if (map.province(name).structure().has_value())
+            ++withStructure;
     }
 
-    const auto expected =
-        static_cast<std::size_t>(static_cast<float>(total) * MAP_STRUCTURE_RATIO);
+    const auto expected = static_cast<std::size_t>(static_cast<float>(total) * MAP_STRUCTURE_RATIO);
     EXPECT_EQ(withStructure, expected);
 }
 
@@ -288,19 +290,19 @@ TEST_F(MapGeneratorTest, StructureCount_MatchesRatio) {
 
 TEST_F(MapGeneratorTest, SameSeed_ProducesSameMap) {
     const std::vector<House*> players1 = {&baratheon, &stark};
-    const std::size_t n = MAP_BASE_PROVINCES + MAP_PROVINCES_PER_PLAYER * 2;
+    const std::size_t         n        = MAP_BASE_PROVINCES + MAP_PROVINCES_PER_PLAYER * 2;
 
-    std::mt19937 rng1{99};
+    std::mt19937  rng1{99};
     ThematicNamer namer1(namesWithStrongholds(players1, n));
-    auto map1 = MapGenerator{topology, namer1}.generate(players1, rng1);
+    auto          map1 = MapGenerator{topology, namer1}.generate(players1, rng1);
 
-    House bar2{"Barathéon", makeHand()};
-    House sta2{"Stark",     makeHand()};
+    House               bar2{"Barathéon", makeHand()};
+    House               sta2{"Stark", makeHand()};
     std::vector<House*> players2 = {&bar2, &sta2};
 
-    std::mt19937 rng2{99};
+    std::mt19937  rng2{99};
     ThematicNamer namer2(namesWithStrongholds(players2, n));
-    auto map2 = MapGenerator{topology, namer2}.generate(players2, rng2);
+    auto          map2 = MapGenerator{topology, namer2}.generate(players2, rng2);
 
     EXPECT_EQ(map1.size(), map2.size());
     EXPECT_EQ(map1.provinceNames(), map2.provinceNames());

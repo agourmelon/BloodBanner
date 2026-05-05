@@ -7,18 +7,18 @@
 // ─────────────────────────────────────────────
 
 class MapIntegrationTest : public ::testing::Test {
-protected:
-    House stark{"Stark",         makeHand()};
+  protected:
+    House stark{"Stark", makeHand()};
     House lannister{"Lannister", makeHand()};
     House baratheon{"Barathéon", makeHand()};
 
     GameMap makeMap() {
         GameMap map;
-        map.addProvince(Province{"Winterfell",  Stronghold{}, {"Blancport",    "Castral Roc"}});
-        map.addProvince(Province{"Blancport",   Castle{},     {"Winterfell",   "Port-Réal"}});
-        map.addProvince(Province{"Port-Réal",   Stronghold{}, {"Blancport",    "Vivesaigues"}});
-        map.addProvince(Province{"Castral Roc", Castle{},     {"Winterfell",   "Vivesaigues"}});
-        map.addProvince(Province{"Vivesaigues", std::nullopt, {"Port-Réal",    "Castral Roc"}});
+        map.addProvince(Province{"Winterfell", Stronghold{}, {"Blancport", "Castral Roc"}});
+        map.addProvince(Province{"Blancport", Castle{}, {"Winterfell", "Port-Réal"}});
+        map.addProvince(Province{"Port-Réal", Stronghold{}, {"Blancport", "Vivesaigues"}});
+        map.addProvince(Province{"Castral Roc", Castle{}, {"Winterfell", "Vivesaigues"}});
+        map.addProvince(Province{"Vivesaigues", std::nullopt, {"Port-Réal", "Castral Roc"}});
         return map;
     }
 };
@@ -34,16 +34,16 @@ TEST_F(MapIntegrationTest, MapSize) {
 
 TEST_F(MapIntegrationTest, AdjacentProvinces) {
     auto map = makeMap();
-    EXPECT_TRUE(map.areAdjacent("Winterfell",  "Blancport"));
-    EXPECT_TRUE(map.areAdjacent("Winterfell",  "Castral Roc"));
+    EXPECT_TRUE(map.areAdjacent("Winterfell", "Blancport"));
+    EXPECT_TRUE(map.areAdjacent("Winterfell", "Castral Roc"));
     EXPECT_FALSE(map.areAdjacent("Winterfell", "Port-Réal"));
     EXPECT_FALSE(map.areAdjacent("Winterfell", "Vivesaigues"));
 }
 
 TEST_F(MapIntegrationTest, NeighborCount) {
     auto map = makeMap();
-    EXPECT_EQ(map.neighbors("Winterfell").size(),  2);
-    EXPECT_EQ(map.neighbors("Blancport").size(),   2);
+    EXPECT_EQ(map.neighbors("Winterfell").size(), 2);
+    EXPECT_EQ(map.neighbors("Blancport").size(), 2);
     EXPECT_EQ(map.neighbors("Vivesaigues").size(), 2);
 }
 
@@ -58,7 +58,7 @@ TEST_F(MapIntegrationTest, PlaceUnitsOnMultipleProvinces) {
     map.province("Port-Réal").addUnit(Footman{&lannister});
 
     EXPECT_EQ(map.province("Winterfell").units().size(), 2);
-    EXPECT_EQ(map.province("Port-Réal").units().size(),  1);
+    EXPECT_EQ(map.province("Port-Réal").units().size(), 1);
     EXPECT_TRUE(map.province("Blancport").units().empty());
 }
 
@@ -68,7 +68,7 @@ TEST_F(MapIntegrationTest, ControllerFollowsUnits) {
     map.province("Port-Réal").addUnit(Footman{&lannister});
 
     EXPECT_EQ(&map.province("Winterfell").controller()->get(), &stark);
-    EXPECT_EQ(&map.province("Port-Réal").controller()->get(),  &lannister);
+    EXPECT_EQ(&map.province("Port-Réal").controller()->get(), &lannister);
     EXPECT_FALSE(map.province("Blancport").controller().has_value());
 }
 
@@ -119,5 +119,5 @@ TEST_F(MapIntegrationTest, StructuresOnMap) {
 TEST_F(MapIntegrationTest, RecruitmentPointsOnMap) {
     auto map = makeMap();
     EXPECT_EQ(recruitmentPoints(map.province("Winterfell").structure().value()), 2);
-    EXPECT_EQ(recruitmentPoints(map.province("Blancport").structure().value()),  1);
+    EXPECT_EQ(recruitmentPoints(map.province("Blancport").structure().value()), 1);
 }

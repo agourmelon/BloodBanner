@@ -1,20 +1,20 @@
 #include "common/game_state.hpp"
-#include <gtest/gtest.h>
 #include "test_utils.hpp"
+#include <gtest/gtest.h>
 
 // ─────────────────────────────────────────────
 // Fixture
 // ─────────────────────────────────────────────
 class GameStateTest : public ::testing::Test {
-protected:
+  protected:
     House stark{"Stark", makeHand()};
     House lannister{"Lannister", makeHand()};
 
     GameMap makeSimpleMap() {
         GameMap map;
-        map.addProvince(Province{"Winterfell", std::nullopt, {"Borderive","Blancport"}});
-        map.addProvince(Province{"Borderive",  std::nullopt, {"Winterfell","Blancport"}});
-        map.addProvince(Province{"Blancport",  Castle{},     {"Winterfell","Borderive"}});
+        map.addProvince(Province{"Winterfell", std::nullopt, {"Borderive", "Blancport"}});
+        map.addProvince(Province{"Borderive", std::nullopt, {"Winterfell", "Blancport"}});
+        map.addProvince(Province{"Blancport", Castle{}, {"Winterfell", "Borderive"}});
         return map;
     }
 };
@@ -53,20 +53,20 @@ TEST_F(GameStateTest, HasProvince) {
 
 TEST_F(GameStateTest, AreAdjacent) {
     auto map = makeSimpleMap();
-    EXPECT_TRUE(map.areAdjacent("Winterfell","Borderive"));
-    EXPECT_TRUE(map.areAdjacent("Winterfell","Blancport"));
+    EXPECT_TRUE(map.areAdjacent("Winterfell", "Borderive"));
+    EXPECT_TRUE(map.areAdjacent("Winterfell", "Blancport"));
 }
 
 TEST_F(GameStateTest, AreNotAdjacent) {
     GameMap map;
     map.addProvince(Province{"Winterfell", std::nullopt, {"Borderive"}});
-    map.addProvince(Province{"Borderive",  std::nullopt, {"Winterfell"}});
-    map.addProvince(Province{"Blancport",  std::nullopt, {}});
-    EXPECT_FALSE(map.areAdjacent("Winterfell","Blancport"));
+    map.addProvince(Province{"Borderive", std::nullopt, {"Winterfell"}});
+    map.addProvince(Province{"Blancport", std::nullopt, {}});
+    EXPECT_FALSE(map.areAdjacent("Winterfell", "Blancport"));
 }
 
 TEST_F(GameStateTest, Neighbors) {
-    auto map = makeSimpleMap();
+    auto map       = makeSimpleMap();
     auto neighbors = map.neighbors("Winterfell");
     EXPECT_EQ(neighbors.size(), 2);
 }

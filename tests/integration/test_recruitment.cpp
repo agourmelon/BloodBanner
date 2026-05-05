@@ -7,15 +7,15 @@
 // ─────────────────────────────────────────────
 
 class RecruitmentIntegrationTest : public ::testing::Test {
-protected:
-    House stark{"Stark",         makeHand()};
+  protected:
+    House stark{"Stark", makeHand()};
     House lannister{"Lannister", makeHand()};
 
     GameMap makeMap() {
         GameMap map;
-        map.addProvince(Province{"Winterfell",  Stronghold{}, {"Blancport"}});
-        map.addProvince(Province{"Blancport",   Castle{},     {"Winterfell", "Port-Réal"}});
-        map.addProvince(Province{"Port-Réal",   std::nullopt, {"Blancport"}});
+        map.addProvince(Province{"Winterfell", Stronghold{}, {"Blancport"}});
+        map.addProvince(Province{"Blancport", Castle{}, {"Winterfell", "Port-Réal"}});
+        map.addProvince(Province{"Port-Réal", std::nullopt, {"Blancport"}});
         return map;
     }
 };
@@ -25,22 +25,22 @@ protected:
 // ─────────────────────────────────────────────
 
 TEST_F(RecruitmentIntegrationTest, StrongholdGivesTwoRecruitmentPoints) {
-    auto map = makeMap();
-    auto& p = map.province("Winterfell");
+    auto  map = makeMap();
+    auto& p   = map.province("Winterfell");
     ASSERT_TRUE(p.structure().has_value());
     EXPECT_EQ(recruitmentPoints(p.structure().value()), 2);
 }
 
 TEST_F(RecruitmentIntegrationTest, CastleGivesOneRecruitmentPoint) {
-    auto map = makeMap();
-    auto& p = map.province("Blancport");
+    auto  map = makeMap();
+    auto& p   = map.province("Blancport");
     ASSERT_TRUE(p.structure().has_value());
     EXPECT_EQ(recruitmentPoints(p.structure().value()), 1);
 }
 
 TEST_F(RecruitmentIntegrationTest, ProvinceWithoutStructureGivesNoRecruitmentPoints) {
-    auto map = makeMap();
-    auto& p = map.province("Port-Réal");
+    auto  map = makeMap();
+    auto& p   = map.province("Port-Réal");
     EXPECT_FALSE(p.structure().has_value());
 }
 
@@ -60,8 +60,8 @@ TEST_F(RecruitmentIntegrationTest, MusterOrderOnStronghold) {
 // ─────────────────────────────────────────────
 
 TEST_F(RecruitmentIntegrationTest, RecruitFootmanOnCastle) {
-    auto map = makeMap();
-    auto& p = map.province("Blancport");
+    auto  map = makeMap();
+    auto& p   = map.province("Blancport");
     p.addUnit(Footman{&stark});
     p.setOrder(MusterOrder{stark});
 
@@ -71,8 +71,8 @@ TEST_F(RecruitmentIntegrationTest, RecruitFootmanOnCastle) {
 }
 
 TEST_F(RecruitmentIntegrationTest, RecruitKnightOnStronghold) {
-    auto map = makeMap();
-    auto& p = map.province("Winterfell");
+    auto  map = makeMap();
+    auto& p   = map.province("Winterfell");
     p.addUnit(Footman{&stark});
     p.setOrder(MusterOrder{stark});
 
@@ -82,8 +82,8 @@ TEST_F(RecruitmentIntegrationTest, RecruitKnightOnStronghold) {
 }
 
 TEST_F(RecruitmentIntegrationTest, UpgradeFootmanToKnight) {
-    auto map = makeMap();
-    auto& p = map.province("Winterfell");
+    auto    map = makeMap();
+    auto&   p   = map.province("Winterfell");
     Footman f{&stark};
     p.addUnit(f);
     p.setOrder(MusterOrder{stark});
@@ -101,8 +101,8 @@ TEST_F(RecruitmentIntegrationTest, UpgradeFootmanToKnight) {
 // ─────────────────────────────────────────────
 
 TEST_F(RecruitmentIntegrationTest, ControllerUnchangedAfterRecruitment) {
-    auto map = makeMap();
-    auto& p = map.province("Winterfell");
+    auto  map = makeMap();
+    auto& p   = map.province("Winterfell");
     p.addUnit(Footman{&stark});
     p.addUnit(Footman{&stark});
 

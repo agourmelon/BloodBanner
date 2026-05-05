@@ -8,7 +8,7 @@
 TEST(HouseCardTest, EqualityOperator) {
     HouseCard a{"Eddard Stark", 3, 1, 0};
     HouseCard b{"Eddard Stark", 3, 1, 0};
-    HouseCard c{"Robb Stark",   4, 0, 0};
+    HouseCard c{"Robb Stark", 4, 0, 0};
 
     EXPECT_EQ(a, b);
     EXPECT_NE(a, c);
@@ -19,14 +19,14 @@ TEST(HouseCardTest, EqualityOperator) {
 // ─────────────────────────────────────────────
 
 class HouseCardHandTest : public ::testing::Test {
-protected:
-    HouseCard c1{"Eddard Stark",  3, 1, 0};
-    HouseCard c2{"Robb Stark",    4, 0, 0};
+  protected:
+    HouseCard c1{"Eddard Stark", 3, 1, 0};
+    HouseCard c2{"Robb Stark", 4, 0, 0};
     HouseCard c3{"Catelyn Stark", 0, 0, 0};
     HouseCard c4{"Theon Greyjoy", 1, 1, 0};
-    HouseCard c5{"Roose Bolton",  2, 0, 0};
-    HouseCard c6{"Grande Jon",    2, 0, 1};
-    HouseCard c7{"Ser Rodrik",    1, 0, 1};
+    HouseCard c5{"Roose Bolton", 2, 0, 0};
+    HouseCard c6{"Grande Jon", 2, 0, 1};
+    HouseCard c7{"Ser Rodrik", 1, 0, 1};
 
     HouseCardHand makeHand() {
         return HouseCardHand(std::array<HouseCard, 7>{c1, c2, c3, c4, c5, c6, c7});
@@ -36,19 +36,19 @@ protected:
 TEST_F(HouseCardHandTest, InitialState) {
     auto hand = makeHand();
     EXPECT_EQ(hand.available().size(), 7);
-    EXPECT_EQ(hand.used().size(),      0);
+    EXPECT_EQ(hand.used().size(), 0);
 }
 
 TEST_F(HouseCardHandTest, DiscardMovesCardToUsed) {
     auto hand = makeHand();
     hand.discard(c1);
     EXPECT_EQ(hand.available().size(), 6);
-    EXPECT_EQ(hand.used().size(),      1);
-    EXPECT_EQ(hand.used().front(),     c1);
+    EXPECT_EQ(hand.used().size(), 1);
+    EXPECT_EQ(hand.used().front(), c1);
 }
 
 TEST_F(HouseCardHandTest, DiscardUnavailableCardThrows) {
-    auto hand = makeHand();
+    auto      hand = makeHand();
     HouseCard unknown{"Inconnu", 0, 0, 0};
     EXPECT_THROW(hand.discard(unknown), std::out_of_range);
 }
@@ -67,7 +67,7 @@ TEST_F(HouseCardHandTest, DiscardLastCardSwapsHands) {
 
     // toutes les cartes reviennent dans available
     EXPECT_EQ(hand.available().size(), 6);
-    EXPECT_EQ(hand.used().size(),      1);
+    EXPECT_EQ(hand.used().size(), 1);
 }
 
 TEST_F(HouseCardHandTest, DiscardLastCardIsInUsed) {

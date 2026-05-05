@@ -1,13 +1,13 @@
 #include "common/orders.hpp"
-#include <gtest/gtest.h>
 #include "test_utils.hpp"
+#include <gtest/gtest.h>
 
 // ─────────────────────────────────────────────
 // Fixture
 // ─────────────────────────────────────────────
 
 class OrderTest : public ::testing::Test {
-protected:
+  protected:
     static inline House stark{"Stark", makeHand()};
     static inline House lannister{"Lannister", makeHand()};
 };

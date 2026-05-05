@@ -7,21 +7,15 @@
 // ─────────────────────────────────────────────
 
 class ProvinceTest : public ::testing::Test {
-protected:
-    House stark{"Stark",         makeHand()};
+  protected:
+    House stark{"Stark", makeHand()};
     House lannister{"Lannister", makeHand()};
 
-    Province makeEmptyProvince() {
-        return Province{"Winterfell"};
-    }
+    Province makeEmptyProvince() { return Province{"Winterfell"}; }
 
-    Province makeProvinceWithCastle() {
-        return Province{"Port-Réal", Castle{}};
-    }
+    Province makeProvinceWithCastle() { return Province{"Port-Réal", Castle{}}; }
 
-    Province makeProvinceWithStronghold() {
-        return Province{"Castral Roc", Stronghold{}};
-    }
+    Province makeProvinceWithStronghold() { return Province{"Castral Roc", Stronghold{}}; }
 };
 
 // ─────────────────────────────────────────────
@@ -99,7 +93,7 @@ TEST_F(ProvinceTest, AddMultipleUnits) {
 }
 
 TEST_F(ProvinceTest, RemoveUnit) {
-    auto p = makeEmptyProvince();
+    auto    p = makeEmptyProvince();
     Footman f{&stark};
     p.addUnit(f);
     p.removeUnit(f);
