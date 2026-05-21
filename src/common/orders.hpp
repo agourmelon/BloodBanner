@@ -1,5 +1,6 @@
 #pragma once
 
+#include "common/helper/technical/overload.hpp"
 #include "houses.hpp"
 #include <string_view>
 #include <variant>
@@ -9,19 +10,19 @@
 // ─────────────────────────────────────────────
 
 struct MarchOrder {
-    const House& owner;
+    House const & owner;
 };
 struct DefenseOrder {
-    const House& owner;
+    House const & owner;
 };
 struct SupportOrder {
-    const House& owner;
+    House const & owner;
 };
 struct MusterOrder {
-    const House& owner;
+    House const & owner;
 };
 struct RaidOrder {
-    const House& owner;
+    House const & owner;
 };
 
 using Order = std::variant<MarchOrder, DefenseOrder, SupportOrder, MusterOrder, RaidOrder>;
@@ -30,28 +31,23 @@ using Order = std::variant<MarchOrder, DefenseOrder, SupportOrder, MusterOrder, 
 // Helpers
 // ─────────────────────────────────────────────
 
-constexpr std::string_view orderTypeName(const Order& o) noexcept {
+constexpr std::string_view orderTypeName(Order const & o) noexcept {
     return std::visit(
-        [](const auto& order) -> std::string_view {
-            using T = std::decay_t<decltype(order)>;
-            if constexpr (std::is_same_v<T, MarchOrder>)
-                return "Marche";
-            else if constexpr (std::is_same_v<T, DefenseOrder>)
-                return "Défense";
-            else if constexpr (std::is_same_v<T, SupportOrder>)
-                return "Soutien";
-            else if constexpr (std::is_same_v<T, MusterOrder>)
-                return "Recrutement";
-            else if constexpr (std::is_same_v<T, RaidOrder>)
-                return "Raid";
+        common::helper::technical::overload{
+            [](MarchOrder const &) -> std::string_view { return "Marche"; },
+            [](DefenseOrder const &) -> std::string_view { return "Défense"; },
+            [](SupportOrder const &) -> std::string_view { return "Soutien"; },
+            [](MusterOrder const &) -> std::string_view { return "Recrutement"; },
+            [](RaidOrder const &) -> std::string_view { return "Raid"; },
         },
-        o);
+        o
+    );
 }
 
-constexpr bool isRaidable(const Order& o) noexcept {
+constexpr bool isRaidable(Order const & o) noexcept {
     return std::holds_alternative<SupportOrder>(o) || std::holds_alternative<MusterOrder>(o);
 }
 
-inline const House& orderOwner(const Order& o) noexcept {
-    return std::visit([](const auto& order) -> const House& { return order.owner; }, o);
+inline House const & orderOwner(Order const & o) noexcept {
+    return std::visit([](auto const & order) -> House const & { return order.owner; }, o);
 }
