@@ -142,7 +142,7 @@ SortUsingDeclarations                         : Never
 # --- Pointer / reference / qualifier alignment ---
 PointerAlignment                              : Middle
 QualifierAlignment                            : Custom
-QualifierOrder                                : ['friend', 'constexpr', 'static', 'inline', 'type', 'const', 'volatile', 'restrict']
+QualifierOrder                                : ['friend', 'const', 'constexpr', 'static', 'inline', 'volatile', 'restrict', 'type']
 ReferenceAlignment                            : Middle
 
 # --- Spaces ---
