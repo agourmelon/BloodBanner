@@ -35,7 +35,7 @@ Chaque joueur dispose de :
 ### Mise en place
 
 - La carte est **générée aléatoirement** au lancement, proportionnée au nombre de joueurs
-- Chaque joueur commence avec des unités sur sa **forteresse de départ** et sur **2-3 provinces adjacentes**
+- Chaque joueur commence avec des unités sur sa **forteresse de départ** et sur **1-2 provinces adjacentes**
 
 Forteresses de départ :
 
@@ -60,7 +60,7 @@ Forteresses de départ :
   - **Défense** : +1 force défensive (passif)
   - **Soutien** : renforce un combat dans une province adjacente (passif)
   - **Recrutement** : recrute de nouvelles unités (uniquement sur château/forteresse)
-  - **Raid** : retire un ordre Soutien ou Recrutement adverse adjacent
+  - **Raid** : retire un ordre Soutien, Recrutement ou Raid adverse adjacent
 - Une province sans unité ne peut pas recevoir d'ordre
 - Quand tous les joueurs ont fini, on passe à la résolution
 
@@ -70,7 +70,7 @@ Tous les ordres sont révélés. Résolution dans cet ordre, et à chaque fois d
 
 #### 1. Raid
 
-- Retire un ordre **Soutien** ou **Recrutement** adverse dans une province adjacente
+- Retire un ordre **Soutien**, **Recrutement** ou de **Raid** adverse dans une province adjacente
 
 #### 2. Marche
 
@@ -114,7 +114,7 @@ Le joueur sur place est le **défenseur**, l'arrivant est l'**attaquant**.
 ### 4. Résolution
 
 - Le joueur avec la plus grande force **remporte la bataille**
-- En cas d'égalité : le défenseur l'emporte
+- En cas d'égalité : le défenseur l'emporte (__future: Le plus haut sur la piste des fiefs l'emporte__)
 
 ### 5. Retraite
 
@@ -130,13 +130,13 @@ Le joueur sur place est le **défenseur**, l'arrivant est l'**attaquant**.
 ### 7. Cartes jouées
 
 - Une carte jouée est défaussée
-- Si toutes les cartes d'un joueur sont défaussées → toutes reviennent en main
+- Si toutes les cartes d'un joueur sont défaussées → toutes reviennent en main sauf la dernière qui a été posée.
 
 ---
 
 ## Condition de victoire
 
-La partie s'arrête **immédiatement** lorsqu'un joueur contrôle **10 châteaux et/ou forteresses**.
+La partie s'arrête **immédiatement** lorsqu'un joueur contrôle **7 châteaux et/ou forteresses**.
 
 ---
 
@@ -194,7 +194,12 @@ bloodbanner/
 
 ### Extensions futures anticipées
 
-- **Mers et ports** : nouveau type de province pour les bateaux
-- **Pions d'influence** : maintien du contrôle d'une province vide
+- **Mers et ports** : nouveau type de province pour les bateaux. Assymétrie Terre/Mer pour l'application des ordres, restriction de terrain (Mer -> Bateaux, Fantassin/Chevalier/Siège -> Terre). Logique de pont maritime.
+- **Pions d'influence** : maintien du contrôle d'une province vide, Ordre **Consolidation de Pouvoir**, utilisation lors des enchères pour les pistes d'influences.
+- **Ordre Spéciaux** : Version boosté de certains ordre, utilisation limité par la position du joueur sur la piste **Cour du Roi**
+- **Jeu des pistes d'influences** : Trois pistes: 
+  1. **Trone de Fer** : Définit l'ordre du tour des joueurs. Le premier sur la piste peut départager les inégalité lors des enchères pour les pistes d'influences (Le trone de fer).
+  2. **Fiefs** : Départage lors d'une égalité dans un combat. Le premier peut utiliser une seule fois par manche un bonus de +1 au combat (Lame d'acier Valyrien).
+  3. **Cour du Roi** : Détermine le nombre maximal d'ordre spéciaux que les joueurs peuvent jouer. Ex: Le premier 3, le second 3, le 3è seulemnet 2, le 4è seulement 1 et 0 pour les autres. Le premier a aussi le pouvoir de changer un de ces ordres après révélation (Corneille à trois yeux).
 - **Topologie Delaunay** : alternative à la grille hexagonale
-- **Ordres spéciaux** : effets des cartes personnages
+- **Effets cartes Personnages** : effets spécifiques autres que les "épées" et "tours".
