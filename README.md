@@ -1,4 +1,4 @@
-# BloodBanner — CLAUDE.md
+# BloodBanner
 
 ## Présentation
 
