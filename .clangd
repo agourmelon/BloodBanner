@@ -1,0 +1,39 @@
+CompileFlags:
+  CompilationDatabase: build
+  Add:
+    - -std=c++23
+    - -stdlib=libc++
+    - -Wall
+    - -Wextra
+    - -Wpedantic
+
+Diagnostics:
+  UnusedIncludes: Strict
+  MissingIncludes: Strict
+  ClangTidy:
+    FastCheckFilter: Loose
+
+Index:
+  Background: Build
+  StandardLibrary: Yes
+
+InlayHints:
+  Enabled: Yes
+  ParameterNames: Yes
+  DeducedTypes: Yes
+  Designators: Yes
+
+Hover:
+  ShowAKA: Yes
+
+Completion:
+  AllScopes: Yes
+
+---
+# Ne pas analyser le code généré par les dépendances
+If:
+  PathMatch:
+    - build/.*
+    - .*/_deps/.*
+Diagnostics:
+  Suppress: "*"

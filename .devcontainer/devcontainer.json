@@ -1,0 +1,37 @@
+{
+    "name": "GoTBG - C++23 with Clang",
+    "dockerFile": "Dockerfile",
+    "workspaceFolder": "/workspace",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
+    
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cpptools",
+                "ms-vscode.cmake-tools",
+                "ms-azuretools.vscode-containers",
+                "ms-vscode.cpptools-themes",
+                "llvm-vs-code-extensions.vscode-clangd",
+                "xaver.clang-format"
+            ],
+            "settings": {
+                "C_Cpp.intelliSenseEngine": "disabled",
+                "C_Cpp.default.compilerPath": "/usr/bin/clang++",
+                "C_Cpp.default.cppStandard": "c++23",
+                "C_Cpp.default.cStandard": "c17",
+                "clangd.checkUpdates": false,
+                "[cpp]": {
+                    "editor.defaultFormatter": "xaver.clang-format",
+                    "editor.formatOnSave": true
+                }
+            }
+        }
+    },
+    
+    "features": {
+    },
+    
+    "postCreateCommand": "clang++ --version && echo 'Dev container ready for C++23 development'",
+    
+    "remoteUser": "root"
+}

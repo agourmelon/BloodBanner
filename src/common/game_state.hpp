@@ -2,8 +2,15 @@
 
 #include "houses.hpp"
 #include "provinces.hpp"
+#include <algorithm>
+#include <cstddef>
+#include <format>
+#include <functional>
+#include <ranges>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 // ─────────────────────────────────────────────
@@ -23,30 +30,23 @@ class GameMap {
     std::unordered_map<std::string, Province> provinces_;
     std::vector<std::string>                  orderedIds_;
 
-  public:
-    void addProvince(Province&& p) {
+public:
+
+    void addProvince(Province && p) {
         const std::string id = p.name();
         orderedIds_.push_back(id);
         provinces_.emplace(id, std::move(p));
     }
 
-    [[nodiscard]] Province& province(const std::string& id) {
-        auto it = provinces_.find(id);
-        if (it == provinces_.end())
-            throw std::out_of_range(std::format("Province inconnue : {}", id));
-        return it->second;
+    [[nodiscard]] Province & province(const std::string & id) { return provinces_.at(id); }
+
+    [[nodiscard]] const Province & province(const std::string & id) const {
+        return provinces_.at(id);
     }
 
-    [[nodiscard]] const Province& province(const std::string& id) const {
-        auto it = provinces_.find(id);
-        if (it == provinces_.end())
-            throw std::out_of_range(std::format("Province inconnue : {}", id));
-        return it->second;
-    }
+    [[nodiscard]] bool hasProvince(const std::string & id) const { return provinces_.contains(id); }
 
-    [[nodiscard]] bool hasProvince(const std::string& id) const { return provinces_.contains(id); }
-
-    [[nodiscard]] const std::vector<std::string>& provinceNames() const noexcept {
+    [[nodiscard]] const std::vector<std::string> & provinceNames() const noexcept {
         return orderedIds_;
     }
 
@@ -54,20 +54,21 @@ class GameMap {
 
     // ── Helpers ───────────────────────────────
 
-    [[nodiscard]] std::vector<const Province*> neighbors(const std::string& id) const {
-        std::vector<const Province*> result;
-        for (const auto& adjId : province(id).adjacentNames())
-            result.push_back(&province(adjId));
-        return result;
+    [[nodiscard]] std::vector<const Province *> neighbors(const std::string & id) const {
+        return std::ranges::views::transform(
+                   province(id).adjacentNames(),
+                   [this](const auto & adjacentId) { return &province(adjacentId); }
+               )
+            | std::ranges::to<std::vector<const Province *>>();
     }
 
-    [[nodiscard]] bool areAdjacent(const std::string& a, const std::string& b) const {
-        const auto& adj = province(a).adjacentNames();
+    [[nodiscard]] bool areAdjacent(const std::string & a, const std::string & b) const {
+        const auto & adj = province(a).adjacentNames();
         return std::ranges::find(adj, b) != adj.end();
     }
 
     void clearAllOrders() {
-        for (auto& [id, p] : provinces_)
+        for (auto & [id, p] : provinces_)
             p.clearOrder();
     }
 };
