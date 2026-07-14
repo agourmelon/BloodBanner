@@ -2,14 +2,13 @@
 
 #include "houses.hpp"
 #include "provinces.hpp"
-#include <algorithm>
 #include <cstddef>
-#include <format>
 #include <functional>
 #include <ranges>
 #include <stdexcept>
-#include <string>
+#include <string_view>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -27,44 +26,45 @@ struct Player {
 // ─────────────────────────────────────────────
 
 class GameMap {
-    std::unordered_map<std::string, Province> provinces_;
-    std::vector<std::string>                  orderedIds_;
+    std::unordered_map<std::string_view, Province>                             provinces_;
+    std::unordered_map<std::string_view, std::unordered_set<std::string_view>> borders_;
 
 public:
 
-    void addProvince(Province && p) {
-        const std::string id = p.name();
-        orderedIds_.push_back(id);
-        provinces_.emplace(id, std::move(p));
+    void addProvince(std::string_view name, Province && p) {
+        if (!provinces_.try_emplace(name, std::move(p)).second) {
+            throw std::invalid_argument("A province with the same name already exists");
+        };
+        borders_.emplace(name, std::unordered_set<std::string_view>());
     }
 
-    [[nodiscard]] Province & province(const std::string & id) { return provinces_.at(id); }
-
-    [[nodiscard]] const Province & province(const std::string & id) const {
-        return provinces_.at(id);
+    void linkProvinces(std::string_view name1, std::string_view name2) {
+        borders_.at(name1).emplace(name2);
+        borders_.at(name2).emplace(name1);
     }
 
-    [[nodiscard]] bool hasProvince(const std::string & id) const { return provinces_.contains(id); }
+    [[nodiscard]] Province & getProvince(std::string_view name) { return provinces_.at(name); }
 
-    [[nodiscard]] const std::vector<std::string> & provinceNames() const noexcept {
-        return orderedIds_;
+    [[nodiscard]] bool hasProvince(std::string_view name) const {
+        return provinces_.contains(name);
+    }
+
+    [[nodiscard]] std::vector<std::string_view> getAllProvinceNames() const noexcept {
+        return provinces_ | std::views::keys | std::ranges::to<std::vector>();
     }
 
     [[nodiscard]] std::size_t size() const noexcept { return provinces_.size(); }
 
     // ── Helpers ───────────────────────────────
 
-    [[nodiscard]] std::vector<const Province *> neighbors(const std::string & id) const {
-        return std::ranges::views::transform(
-                   province(id).adjacentNames(),
-                   [this](const auto & adjacentId) { return &province(adjacentId); }
-               )
-            | std::ranges::to<std::vector<const Province *>>();
+    [[nodiscard]] std::unordered_set<std::string_view> getAdjacentProvinceNames(
+        std::string_view name
+    ) const {
+        return borders_.at(name);
     }
 
-    [[nodiscard]] bool areAdjacent(const std::string & a, const std::string & b) const {
-        const auto & adj = province(a).adjacentNames();
-        return std::ranges::find(adj, b) != adj.end();
+    [[nodiscard]] bool areProvincesAdjacent(std::string_view name1, std::string_view name2) const {
+        return borders_.at(name1).contains(name2);
     }
 
     void clearAllOrders() {

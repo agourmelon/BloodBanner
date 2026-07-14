@@ -40,41 +40,23 @@ constexpr int recruitmentPoints(const Structure & s) noexcept {
 // ─────────────────────────────────────────────
 
 class Province {
-    std::string                                        name_;
     std::optional<Structure>                           structure_;
     std::optional<std::reference_wrapper<const House>> controller_;
     std::vector<Unit>                                  units_;
     std::optional<Order>                               order_;
-    std::vector<std::string>                           adjacentNames_;
 
 public:
 
-    explicit Province(
-        std::string              name,
-        std::optional<Structure> structure     = std::nullopt,
-        std::vector<std::string> adjacentNames = {}
-    )
-        : name_{std::move(name)}
-        , structure_{structure}
-        , adjacentNames_{std::move(adjacentNames)} {}
-
+    explicit Province(std::optional<Structure> structure = std::nullopt)
+        : structure_{structure} {}
     // ── Getters ───────────────────────────────
 
-    [[nodiscard]] const std::string &              name() const noexcept { return name_; }
     [[nodiscard]] const std::optional<Structure> & structure() const noexcept { return structure_; }
     [[nodiscard]] const std::vector<Unit> &        units() const noexcept { return units_; }
     [[nodiscard]] const std::optional<Order> &     order() const noexcept { return order_; }
-    [[nodiscard]] const std::vector<std::string> & adjacentNames() const noexcept {
-        return adjacentNames_;
-    }
-
     [[nodiscard]] std::optional<std::reference_wrapper<const House>> controller() const noexcept {
         return controller_;
     }
-
-    // ── Voisins ───────────────────────────────
-
-    void addAdjacentName(std::string name) { adjacentNames_.push_back(std::move(name)); }
 
     // ── Unités ────────────────────────────────
 
