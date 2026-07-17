@@ -1,20 +1,29 @@
 #include "common/game_state.hpp"
+#include "common/houses.hpp"
+#include "common/orders.hpp"
+#include "common/provinces.hpp"
 #include "test_utils.hpp"
 #include <gtest/gtest.h>
+#include <optional>
+#include <stdexcept>
 
 // ─────────────────────────────────────────────
 // Fixture
 // ─────────────────────────────────────────────
 class GameStateTest : public ::testing::Test {
-  protected:
+protected:
+
     House stark{"Stark", makeHand()};
     House lannister{"Lannister", makeHand()};
 
-    GameMap makeSimpleMap() {
+    static GameMap makeSimpleMap() {
         GameMap map;
-        map.addProvince(Province{"Winterfell", std::nullopt, {"Borderive", "Blancport"}});
-        map.addProvince(Province{"Borderive", std::nullopt, {"Winterfell", "Blancport"}});
-        map.addProvince(Province{"Blancport", Castle{}, {"Winterfell", "Borderive"}});
+        map.addProvince("Winterfell", Province{std::nullopt});
+        map.addProvince("Borderive", Province{std::nullopt});
+        map.addProvince("Blancport", Province{Castle{}});
+
+        map.linkProvinces("Winterfell", "Borderive");
+        map.linkProvinces("Winterfell", "Blancport");
         return map;
     }
 };
@@ -25,24 +34,25 @@ class GameStateTest : public ::testing::Test {
 
 TEST_F(GameStateTest, AddProvince) {
     GameMap map;
-    map.addProvince(Province{"Winterfell"});
+    map.addProvince("Winterfell", Province{});
     EXPECT_EQ(map.size(), 1);
 }
 
 TEST_F(GameStateTest, ProvinceAccessByName) {
-    GameMap map;
-    map.addProvince(Province{"Winterfell"});
-    EXPECT_EQ(map.province("Winterfell").name(), "Winterfell");
+    GameMap map = makeSimpleMap();
+    EXPECT_EQ(typeid(map.getProvince("Blancport").structure()), typeid(Castle));
+    EXPECT_EQ(map.getProvince("Winterfell").structure(), std::nullopt);
+    EXPECT_EQ(map.getProvince("Borderive").structure(), std::nullopt);
 }
 
 TEST_F(GameStateTest, UnknownProvinceThrows) {
     GameMap map;
-    EXPECT_THROW(auto p{map.province("unknown")}, std::out_of_range);
+    EXPECT_THROW(auto p{map.getProvince("unknown")}, std::out_of_range);
 }
 
 TEST_F(GameStateTest, HasProvince) {
     GameMap map;
-    map.addProvince(Province{"Winterfell"});
+    map.addProvince("Winterfell", Province{});
     EXPECT_TRUE(map.hasProvince("Winterfell"));
     EXPECT_FALSE(map.hasProvince("unknown"));
 }
@@ -53,21 +63,18 @@ TEST_F(GameStateTest, HasProvince) {
 
 TEST_F(GameStateTest, AreAdjacent) {
     auto map = makeSimpleMap();
-    EXPECT_TRUE(map.areAdjacent("Winterfell", "Borderive"));
-    EXPECT_TRUE(map.areAdjacent("Winterfell", "Blancport"));
+    EXPECT_TRUE(map.areProvincesAdjacent("Winterfell", "Borderive"));
+    EXPECT_TRUE(map.areProvincesAdjacent("Winterfell", "Blancport"));
 }
 
 TEST_F(GameStateTest, AreNotAdjacent) {
-    GameMap map;
-    map.addProvince(Province{"Winterfell", std::nullopt, {"Borderive"}});
-    map.addProvince(Province{"Borderive", std::nullopt, {"Winterfell"}});
-    map.addProvince(Province{"Blancport", std::nullopt, {}});
-    EXPECT_FALSE(map.areAdjacent("Winterfell", "Blancport"));
+    auto map = makeSimpleMap();
+    EXPECT_FALSE(map.areProvincesAdjacent("Borderive", "Blancport"));
 }
 
-TEST_F(GameStateTest, Neighbors) {
+TEST_F(GameStateTest, AdjacentProvinceNames) {
     auto map       = makeSimpleMap();
-    auto neighbors = map.neighbors("Winterfell");
+    auto neighbors = map.getAdjacentProvinceNames("Winterfell");
     EXPECT_EQ(neighbors.size(), 2);
 }
 
@@ -77,15 +84,13 @@ TEST_F(GameStateTest, Neighbors) {
 
 TEST_F(GameStateTest, ClearAllOrders) {
     auto map = makeSimpleMap();
-    map.province("Winterfell").addUnit(Footman{&stark});
-    map.province("Borderive").addUnit(Footman{&lannister});
-    map.province("Winterfell").setOrder(MarchOrder{stark});
-    map.province("Borderive").setOrder(DefenseOrder{lannister});
+    map.getProvince("Winterfell").setOrder(MarchOrder{stark});
+    map.getProvince("Borderive").setOrder(DefenseOrder{lannister});
 
     map.clearAllOrders();
 
-    EXPECT_FALSE(map.province("Winterfell").order().has_value());
-    EXPECT_FALSE(map.province("Borderive").order().has_value());
+    EXPECT_FALSE(map.getProvince("Winterfell").order().has_value());
+    EXPECT_FALSE(map.getProvince("Borderive").order().has_value());
 }
 
 // ─────────────────────────────────────────────
@@ -99,13 +104,13 @@ TEST_F(GameStateTest, InitialTurnNumber) {
 
 TEST_F(GameStateTest, AddPlayer) {
     GameState state;
-    state.players.push_back(Player{stark});
+    state.players.push_back(Player{.house = stark});
     EXPECT_EQ(state.players.size(), 1);
     EXPECT_EQ(&state.players.front().house.get(), &stark);
 }
 
 TEST_F(GameStateTest, InitialVictoryPoints) {
     GameState state;
-    state.players.push_back(Player{stark});
+    state.players.push_back(Player{.house = stark});
     EXPECT_EQ(state.players.front().victoryPoints, 0);
 }
