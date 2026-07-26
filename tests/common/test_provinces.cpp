@@ -1,4 +1,7 @@
+#include "common/houses.hpp"
+#include "common/orders.hpp"
 #include "common/provinces.hpp"
+#include "common/units.hpp"
 #include "test_utils.hpp"
 #include <gtest/gtest.h>
 
@@ -7,15 +10,16 @@
 // ─────────────────────────────────────────────
 
 class ProvinceTest : public ::testing::Test {
-  protected:
+protected:
+
     House stark{"Stark", makeHand()};
     House lannister{"Lannister", makeHand()};
 
-    Province makeEmptyProvince() { return Province{"Winterfell"}; }
+    static Province makeEmptyProvince() { return Province{}; }
 
-    Province makeProvinceWithCastle() { return Province{"Port-Réal", Castle{}}; }
+    static Province makeProvinceWithCastle() { return Province{Castle{}}; }
 
-    Province makeProvinceWithStronghold() { return Province{"Castral Roc", Stronghold{}}; }
+    static Province makeProvinceWithStronghold() { return Province{Stronghold{}}; }
 };
 
 // ─────────────────────────────────────────────
